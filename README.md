@@ -460,8 +460,27 @@ The `hdml-field` component represents a field within an `hdml-table` in the HDML
 - `type` (Optional): The data type of the field in the HDML context. Supported types include: `int-8`, `int-16`, `int-32`, `int-64`, `uint-8`, `uint-16`, `uint-32`, `uint-64`, `float-16`, `float-32`, `float-64`, `binary`, `utf-8`, `decimal`, `date`, `time`, `timestamp`.
 - `nullable` (Optional, default: `false`): Specifies whether the field can contain null values.
 - `clause` (Optional): An SQL clause defining the field. It takes precedence over the `origin` attribute. For example, ```clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)"```.
+- `agg` (Optional, applicable in `hdml-frame`): Specifies an aggregation function for the field. Supported functions include: `none`, `count`, `countDistinct`, `countDistinctApprox`, `sum`, `avg`, `min`, `max`.
+- `asc` (Optional, applicable in `hdml-frame`): Specifies the type of sorting for the field. Use `true` for ascending and `false` for descending.
 
-### Example:
+#### Additional Attributes for `type="decimal"`:
+
+- `scale` (Optional): The number of decimal places.
+- `precision` (Optional): The total number of digits, including both the integer and fractional parts.
+- `bit-width` (Optional): The bit width of the decimal field. Supported values include `128` and `256`.
+
+#### Additional Attributes for `type="date"`:
+
+- `unit` (Optional): Specifies the date format unit. Supported values include `second` and `millisecond`.
+
+#### Additional Attributes for `type="timestamp"`:
+
+- `unit` (Optional): Specifies the timestamp format unit. Supported values include `second`, `millisecond`, `microsecond`, and `nanosecond`.
+- `timezone` (Optional): Specifies the timezone for the timestamp field.
+
+### Examples
+
+#### General example
 
 ```html
 <hdml-table
@@ -482,3 +501,74 @@ The `hdml-field` component represents a field within an `hdml-table` in the HDML
 ```
 
 In this example, we define two fields within the `database.schema.your_table` table. The `employee_name` field maps to the `emp_name` field in the database, specifying a UTF-8 data type and a non-nullable constraint. The `full_name` field is created using an SQL `concat` clause, combining the `first_name` and `last_name` fields.
+
+#### `type="decimal"`
+
+```html
+<hdml-table
+   type="table"
+   identifier="`database`.`schema`.`your_table`">
+   <hdml-field
+      name="price"
+      type="decimal"
+      scale="2"
+      precision="10"
+      bit-width="128"
+      nullable="false">
+   </hdml-field>
+</hdml-table>
+```
+
+In this example, the `hdml-field` component with `type="decimal"` includes additional attributes to specify the scale, precision, and bit-width.
+
+#### `type="date"`
+
+```html
+<hdml-table
+   type="table"
+   identifier="`database`.`schema`.`your_table`">
+   <hdml-field
+      name="event_date"
+      type="date"
+      unit="millisecond"
+      nullable="false">
+   </hdml-field>
+</hdml-table>
+```
+
+In this example, the `hdml-field` component with `type="date"` includes the additional `unit` attribute to specify the date format.
+
+#### `type="time"`
+
+```html
+<hdml-table
+   type="table"
+   identifier="`database`.`schema`.`your_table`">
+   <hdml-field
+      name="event_time"
+      type="time"
+      unit="microsecond"
+      nullable="false">
+   </hdml-field>
+</hdml-table>
+```
+
+In this example, the `hdml-field` component with `type="time"` includes the additional `unit` attribute to specify the time format.
+
+#### `type="timestamp"`
+
+```html
+<hdml-table
+   type="table"
+   identifier="`database`.`schema`.`your_table`">
+   <hdml-field
+      name="event_time"
+      type="timestamp"
+      unit="microsecond"
+      timezone="UTC"
+      nullable="false">
+   </hdml-field>
+</hdml-table>
+```
+
+In this example, the `hdml-field` component with `type="timestamp"` includes the additional `unit` and `timezone` attributes to specify the timestamp format and timezone.
