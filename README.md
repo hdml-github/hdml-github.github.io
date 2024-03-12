@@ -658,6 +658,7 @@ The `hdml-join` component is used to define joins between tables within an `hdml
       - **Attributes**:
         - **`type`** (Required): Specifies the type of filter. Supported values include:
           - `keys`: Join based on matching key fields. (Note: Only for use under `hdml-join`)
+          - `expr`: Use a custom SQL-like conditional clause.
 
       - **Attributes for `type="keys"`**:
         - **`left`** (Required): The name of the field in the left table.
