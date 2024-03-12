@@ -627,3 +627,79 @@ In this example, the `hdml-field` component with `type="time"` includes the addi
 ```
 
 In this example, the `hdml-field` component with `type="timestamp"` includes the additional `unit` and `timezone` attributes to specify the timestamp format and timezone.
+
+## `hdml-join`
+
+The `hdml-join` component is used to define joins between tables within an `hdml-model`. It provides flexibility in specifying the type of join and the conditions for the join through a combination of attributes and child components.
+
+### Attributes:
+
+- **`type`** (Required): Specifies the type of join. Supported values include:
+  - `cross`: Produces the Cartesian product of two tables.
+  - `inner`: Returns only the rows that have matching values in both tables.
+  - `full`: Returns all rows when there is a match in either left or right table records.
+  - `left`, `right`: Returns all rows from the left or right table and matching rows from the right or left table.
+  - `full-outer`, `left-outer`, `right-outer`: Similar to `full`, `left`, and `right` but includes unmatched rows as well.
+
+- **`left`** (Required): The name of the left table in the join. Should match the name of an `hdml-table` within the same `hdml-model`.
+
+- **`right`** (Required): The name of the right table in the join. Should match the name of an `hdml-table` within the same `hdml-model`.
+
+### Child Components:
+
+- **`hdml-connective`** (Required): Serves as a logical connective for defining conditions.
+
+  - **Attributes**:
+    - **`operator`** (Required): Specifies the logical operator (`and` or `or`) for connecting multiple filter conditions.
+
+  - **Child Components**:
+    - **`hdml-filter`** (Required): Describes the conditions.
+
+      - **Attributes**:
+        - **`type`** (Required): Specifies the type of filter. Supported values include:
+          - `keys`: Join based on matching key fields. (Note: Only for use under `hdml-join`)
+
+      - **Attributes for `type="keys"`**:
+        - **`left`** (Required): The name of the field in the left table.
+        - **`right`** (Required): The name of the field in the right table.
+
+      - **Attributes for `type="expr"`**:
+        - **`clause`** (Required): Specifies the SQL-like conditional clause.
+        - Example:
+         ```html
+         <hdml-filter
+            type="expr"
+            clause="`table1`.`field1` = `table2`.`field2`">
+         </hdml-filter>
+         ```
+         In this example, it defines a condition based on the equality of `field1` in `table1` with `field2` in `table2`.
+
+#### Example:
+
+```html
+<hdml-join
+   type="inner"
+   left="table1"
+   right="table2">
+   <hdml-connective operator="and">
+      <hdml-filter
+         type="keys"
+         left="field1"
+         right="field2">
+      </hdml-filter>
+      <hdml-filter
+         type="expr"
+         clause="`table1`.`field1` = `table2`.`field2`">
+      </hdml-filter>
+   </hdml-connective>
+</hdml-join>
+
+```
+
+This example demonstrates an `inner` join between `table1` and `table2` with a root `hdml-connective` connecting two conditions.
+
+#### Important Notes:
+
+- You can't have two `hdml-connective` under the `hdml-join`. Some root connective must be there for proper connection.
+- `hdml-filter` with type "keys" is specific to `hdml-join` and must not be used elsewhere.
+- `hdml-connective` and `hdml-filter` will be used not only for joins.
