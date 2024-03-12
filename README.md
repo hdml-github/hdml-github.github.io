@@ -449,3 +449,36 @@ The `hdml-table` component represents a table within a data model in the HDML st
 
 In these examples, the **`hdml-table`** components represent a database table named "employee," a database view named "department," and a materialized view named "sales_data." Adjust the attributes and content based on your specific data modeling requirements.
 
+## `hdml-field`
+
+The `hdml-field` component represents a field within an `hdml-table` in the HDML context.
+
+### Attributes:
+
+- `name` (Required): The name of the field in the HDML context.
+- `origin` (Optional): The name of the original field in the database. If omitted, it is assumed to be the same as the HDML field name.
+- `type` (Optional): The data type of the field in the HDML context. Supported types include: `int-8`, `int-16`, `int-32`, `int-64`, `uint-8`, `uint-16`, `uint-32`, `uint-64`, `float-16`, `float-32`, `float-64`, `binary`, `utf-8`, `decimal`, `date`, `time`, `timestamp`.
+- `nullable` (Optional, default: `false`): Specifies whether the field can contain null values.
+- `clause` (Optional): An SQL clause defining the field. It takes precedence over the `origin` attribute. For example, ```clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)"```.
+
+### Example:
+
+```html
+<hdml-table
+   type="table"
+   identifier="`database`.`schema`.`your_table`">
+   <hdml-field
+      name="employee_name"
+      origin="emp_name"
+      type="utf-8"
+      nullable="false">
+   </hdml-field>
+   <hdml-field
+      name="full_name"
+      clause="concat(`first_name`, ' ', `last_name`)"
+      type="utf-8">
+   </hdml-field>
+</hdml-table>
+```
+
+In this example, we define two fields within the `database.schema.your_table` table. The `employee_name` field maps to the `emp_name` field in the database, specifying a UTF-8 data type and a non-nullable constraint. The `full_name` field is created using an SQL `concat` clause, combining the `first_name` and `last_name` fields.
