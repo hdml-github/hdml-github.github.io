@@ -320,6 +320,7 @@ The `hdml-connection` component represents a connection to a database. It is use
   - `googlesheets`
   - `elasticsearch`
   - `mongodb`
+- `meta` (Optional): Additional metadata or description for the connection.
 
 The `hdml-connection` component allows you to specify the `name` and `type` attributes to identify and categorize your database connections. Choose the appropriate type based on the database system you are connecting to.
 
@@ -426,6 +427,7 @@ The `hdml-model` component represents a data model within the HDML structure. It
 ## Attributes:
 
 - `name` (Required): The name of the data model.
+- `meta` (Optional): Additional metadata or description for the model.
 
 ## Example:
 
@@ -466,6 +468,7 @@ The `hdml-table` component represents a table within a data model in the HDML st
 - `name` (Required): The name of the table.
 - `type` (Required): The type of the table, either "table" for an actual database table, view, or materialized view, or "query" for a table generated from a SQL query.
 - `identifier` (Required): The unique identifier for the table, which should include the full three-tier table name for database tables, views, or materialized views, enclosed in back quotes.
+- `meta` (Optional): Additional metadata or description for the table.
 
 ### Example:
 
@@ -507,6 +510,7 @@ The `hdml-field` component represents a field within an `hdml-table` in the HDML
 - `clause` (Optional): An SQL clause defining the field. It takes precedence over the `origin` attribute. For example, ```clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)"```.
 - `agg` (Optional, applicable in `hdml-frame`): Specifies an aggregation function for the field. Supported functions include: `none`, `count`, `countDistinct`, `countDistinctApprox`, `sum`, `avg`, `min`, `max`.
 - `asc` (Optional, applicable in `hdml-frame`): Specifies the type of sorting for the field. Use `true` for ascending and `false` for descending.
+- `meta` (Optional): Additional metadata or description for the field.
 
 #### Additional Attributes for `type="decimal"`:
 
