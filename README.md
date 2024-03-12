@@ -527,6 +527,12 @@ The `hdml-field` component represents a field within an `hdml-table` in the HDML
 - `unit` (Optional): Specifies the timestamp format unit. Supported values include `second`, `millisecond`, `microsecond`, and `nanosecond`.
 - `timezone` (Optional): Specifies the timezone for the timestamp field.
 
+### Explanation
+
+- **`origin` Attribute**: The `origin` attribute, if specified, represents the original field name in the database. This attribute allows you to map the HDML field to its counterpart in the database.
+
+- **`type` Attribute**: The `type` attribute represents the data type of the field in the HDML context. It does not necessarily mirror the original data type of the field in the database. For example, you may use `type="decimal"` in HDML, even if the original field in the database is of a different numeric type. This attribute allows flexibility in defining the data type as it should be treated within the HDML structure.
+
 ### Examples
 
 #### General example
