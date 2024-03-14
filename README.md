@@ -960,3 +960,30 @@ The `hdml-filter` component is utilized to define filters within the context of 
 
 </hdml-frame>
 ```
+
+## `hdml-frame`
+
+The `hdml-frame` component is used to create a data frame based on the provided HDML model or another HDML frame. It serves as a container for organizing and processing data within the HDML structure. This includes tasks such as filtering, aggregating, sorting, and performing calculations on the data. Essentially, the `hdml-frame` allows for manipulating and analyzing the data according to specified criteria.
+
+### Attributes:
+
+- `name` (Required): The name of the data frame.
+- `source` (Required): Specifies the parent structure for the frame. This attribute indicates the source of the data model used to construct the frame. Depending on whether the parent structure is stored separately or within the same document, the value of this attribute varies:
+   - If the parent structure is stored separately on the HDIO server, the value should be an HDIO path to the file, followed by either `hdml-model=model_name` or `hdml-frame=frame_name`. For example: `/path/to/file.hdml?hdml-model=model_name` or `/path/to/file.hdml?hdml-frame=frame_name`.
+   - If the parent structure is declared within the same file, only specify `hdml-model=model_name` or `hdml-frame=frame_name` without the path and file name. For example: `?hdml-model=model_name` or `?hdml-frame=frame_name`.
+- `limit` (Optional): Specifies the maximum number of rows to include in the frame.
+- `offset` (Optional): Specifies the number of rows to skip before starting to include rows in the frame.
+
+### Example:
+
+```html
+<hdml-frame
+   name="my_frame"
+   source="?hdml-model=model_name"
+   limit="100"
+   offset="10">
+   <!-- Frame content goes here -->
+</hdml-frame>
+```
+
+In this example, a data frame named "my_frame" is created based on the HDML model named "model_name." The frame is configured to include a maximum of 100 rows, starting from the 11th row due to the offset of 10.
