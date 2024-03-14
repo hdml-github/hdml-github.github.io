@@ -79,8 +79,8 @@ HDML (Hyperdata Markup Language) supports the use of environment variables withi
 To include an environment variable in an HDML attribute, use the following syntax:
 
 ```html
-<hdml-element attribute="${ENV_VARIABLE_NAME}">
-  <!-- Element content -->
+<hdml-element
+   attribute="${ENV_VARIABLE_NAME}">
 </hdml-element>
 ```
 
@@ -92,8 +92,12 @@ Replace **`ENV_VARIABLE_NAME`** with the name of the desired environment variabl
 Consider the following example where an environment variable is used within the `host` attribute of an `<hdml-connection>` element:
 
 ```html
-<hdml-connection name="MyDatabase" type="postgres" host="${DB_HOST}" user="user" password="password">
-  <!-- Connection details -->
+<hdml-connection
+   name="MyDatabase"
+   type="postgres"
+   host="${DB_HOST}"
+   user="user"
+   password="password">
 </hdml-connection>
 ```
 
@@ -158,8 +162,8 @@ Create a file named `hook.js` with the following content and place it in the hoo
  */
 export function hook(dom, scope) {
   // Add your custom logic here, utilizing the provided `dom` and
-  // `scope` parameters. For example, you can conditionally modify the
-  // document based on the authenticated user's context.
+  // `scope` parameters. For example, you can conditionally modify
+  // the document based on the authenticated user's context.
 
   // Return the modified or unmodified HTML element
   return dom;
@@ -213,7 +217,9 @@ The `<hdml-include>` component is used to include external HDML documents within
 ### Syntax
 
 ```html
-<hdml-include path="/path/to/external-document.hdml"></hdml-include>
+<hdml-include
+   path="/path/to/external-document.hdml">
+</hdml-include>
 ```
 
 ### Attributes
@@ -242,13 +248,19 @@ You can use the `hdml-include` component in your main document:
 
 ```html
 <!-- main-models.hdml - Main Document with Model Definitions -->
-<hdml-include path="/path/to/connections.hdml"></hdml-include>
+<hdml-include
+   path="/path/to/connections.hdml">
+</hdml-include>
 
 <!-- Define models with references to named connections -->
-<hdml-model name="Model1">
-  <hdml-table name="`connection-1`.`public`.`users`">
-    <!-- ... fields ... -->
-  </hdml-table>
+<hdml-model
+   name="Model1">
+   <hdml-table
+      name="`connection-1`.`public`.`users`">
+
+      <!-- ... fields ... -->
+
+   </hdml-table>
 </hdml-model>
 
 <!-- Add more models and components as needed -->
@@ -388,28 +400,39 @@ The `hdml-model` component represents a data model within the HDML structure. It
 ## Example:
 
 ```html
-<hdml-model name="EmployeeData">
+<hdml-model
+   name="EmployeeData">
    <!-- Tables within the data model -->
    <hdml-table
       name="employee"
       type="table"
       identifier="`database`.`schema`.`employee_table`">
+      
       <!-- ... fields ... -->
+
    </hdml-table>
 
    <hdml-table
       name="department"
       type="query"
       identifier="SELECT * FROM `database`.`schema`.`department_table`">
+      
       <!-- ... fields ... -->
+   
    </hdml-table>
 
    <!-- Join tables using hdml-join -->
-   <hdml-join type="inner" left="employee" right="department">
+   <hdml-join
+      type="inner"
+      left="employee"
+      right="department">
+
       <!-- Additional join configuration -->
+
    </hdml-join>
 
   <!-- Additional tables, joins, and relationships can be added here -->
+
 </hdml-model>
 ```
 
@@ -433,21 +456,27 @@ The `hdml-table` component represents a table within a data model in the HDML st
    name="employee"
    type="table"
    identifier="`database`.`schema`.`employee_table`">
+
    <!-- ... fields ... -->
+
 </hdml-table>
 
 <hdml-table
    name="department"
    type="table"
    identifier="`database`.`schema`.`department_view`">
+
    <!-- ... fields ... -->
+
 </hdml-table>
 
 <hdml-table
    name="sales_data"
    type="query"
    identifier="SELECT * FROM `database`.`schema`.`sales_materialized_view`">
+
    <!-- ... fields ... -->
+
 </hdml-table>
 ```
 
@@ -638,7 +667,8 @@ The `hdml-join` component is used to define joins between tables within an `hdml
    type="inner"
    left="table1"
    right="table2">
-   <hdml-connective operator="and">
+   <hdml-connective
+      operator="and">
       <hdml-filter
          type="keys"
          left="field1"
@@ -675,14 +705,17 @@ The `hdml-connective` component is utilized to define logical connectives. It is
 #### with `hdml-model`
 
 ```html
-<hdml-model name="my_model">
+<hdml-model
+   name="my_model">
+
    <!-- hdml-model configuration -->
 
    <hdml-join
       type="inner"
       left="table1"
       right="table2">
-      <hdml-connective operator="and">
+      <hdml-connective
+         operator="and">
          <hdml-filter
             type="keys"
             left="field1"
@@ -696,17 +729,22 @@ The `hdml-connective` component is utilized to define logical connectives. It is
    </hdml-join>
 
    <!-- hdml-model configuration -->
+
 </hdml-model>
 ```
 
 #### with `hdml-frame`
 
 ```html
-<hdml-frame name="my_frame">
+<hdml-frame
+   name="my_frame"
+   source="?hdml-model=my_model">
+
    <!-- hdml-frame configuration -->
 
    <hdml-filter-by>
-      <hdml-connective operator="and">
+      <hdml-connective
+         operator="and">
          <hdml-filter
             type="expr"
             clause="`field1` = 'ABC'">
@@ -719,6 +757,7 @@ The `hdml-connective` component is utilized to define logical connectives. It is
    </hdml-filter-by>
 
    <!-- hdml-frame configuration -->
+
 </hdml-frame>
 ```
 
@@ -790,6 +829,7 @@ The `hdml-filter` component is utilized to define filters within the context of 
 ```html
 <hdml-model
    name="my_model">
+
    <!-- hdml-model configuration -->
 
    <hdml-join
@@ -807,13 +847,16 @@ The `hdml-filter` component is utilized to define filters within the context of 
    </hdml-join>
 
    <!-- hdml-model configuration -->
+
 </hdml-model>
 ```
 
 #### `type="expr"` under `hdml-model` (`hdml-join`)
 
 ```html
-<hdml-model name="my_model">
+<hdml-model
+   name="my_model">
+
    <!-- hdml-model configuration -->
 
    <hdml-join
@@ -830,6 +873,7 @@ The `hdml-filter` component is utilized to define filters within the context of 
    </hdml-join>
 
    <!-- hdml-model configuration -->
+
 </hdml-model>
 
 ```
@@ -838,7 +882,9 @@ The `hdml-filter` component is utilized to define filters within the context of 
 
 ```html
 <hdml-frame
-   name="my_frame">
+   name="my_frame"
+   source="?hdml-model=my_model">
+
    <!-- hdml-frame configuration -->
 
    <hdml-filter-by>
@@ -852,13 +898,16 @@ The `hdml-filter` component is utilized to define filters within the context of 
    </hdml-filter-by>
 
    <!-- hdml-frame configuration -->
+
 </hdml-frame>
 ```
 
 #### `type="named"` under `hdml-model` (`hdml-join`)
 
 ```html
-<hdml-model name="my_model">
+<hdml-model
+   name="my_model">
+
    <!-- hdml-model configuration -->
 
    <hdml-join
@@ -877,6 +926,7 @@ The `hdml-filter` component is utilized to define filters within the context of 
    </hdml-join>
 
    <!-- hdml-model configuration -->
+
 </hdml-model>
 ```
 
@@ -884,7 +934,9 @@ The `hdml-filter` component is utilized to define filters within the context of 
 
 ```html
 <hdml-frame
-   name="my_frame">
+   name="my_frame"
+   source="?hdml-model=my_model">
+
    <!-- hdml-frame configuration -->
 
    <hdml-filter-by>
@@ -894,12 +946,13 @@ The `hdml-filter` component is utilized to define filters within the context of 
             type="named"
             name="equals"
             field="`field1`"
-            value="ABC">
+            value="'ABC'">
          </hdml-filter>
       </hdml-connective>
    </hdml-filter-by>
 
    <!-- hdml-frame configuration -->
+
 </hdml-frame>
 ```
 
@@ -920,18 +973,95 @@ The `hdml-frame` component is used to create a data frame based on the provided 
 
 **Note:** In the case of using `hdml-field` within the `hdml-frame` component scope, the `origin` attribute refers to the "parent" structure field name.
 
+### Child Components:
+
+- **`hdml-filter-by`** (Optional): The `hdml-filter-by` component is used to filter data within the context of an `hdml-frame`. It allows you to specify conditions to filter rows of data based on specific criteria. This component is essential for refining datasets and focusing on relevant information.
+   - The `hdml-connective` element must be a child element of `hdml-filter-by` and is used to specify the logical operator for joining multiple filter conditions. 
+   - Multiple `hdml-filter` elements can be included within `hdml-connective` to define complex filter conditions.
+- **`hdml-group-by`** (Optional): The `hdml-group-by` component is used within the context of an `hdml-frame` to group data based on specific fields. It allows you to aggregate data based on common values in one or more fields. This component is useful for summarizing data and performing operations on grouped subsets of the dataset.
+   - The `hdml-group-by` component must contain at least one `hdml-field` element to specify the field(s) by which the data will be grouped.
+   - Grouped data can then be further manipulated or analyzed within the frame's scope.
+- **`hdml-sort-by`** (Optional): The `hdml-sort-by` component is used within the context of an `hdml-frame` to sort data based on specific fields. It allows you to arrange data in ascending or descending order based on one or more fields. This component is useful for organizing data and presenting it in a structured manner.
+   - The `hdml-sort-by` component must contain at least one `hdml-field` element to specify the field(s) by which the data will be sorted.
+   - Sorted data can then be further manipulated or analyzed within the frame's scope.
+   - The asc attribute of the `hdml-field` element determines whether the sorting is done in ascending (true) or descending (false) order. This attribute is meaningful only within the context of `hdml-sort-by`.
 
 ### Example:
 
 ```html
 <hdml-frame
    name="my_frame"
-   source="?hdml-model=model_name"
+   source="?hdml-model=my_model"
    limit="100"
    offset="10">
 
-   <!-- Frame content goes here -->
+   <hdml-field
+      name="field_name"
+      origin="my_model_field_name">
+   </hdml-field>
+   <hdml-field
+      name="field_counter"
+      origin="my_model_field_name"
+      agg="count">
+   </hdml-field>
+
+   <hdml-filter-by>
+      <hdml-connective
+         operator="and">
+         <hdml-filter
+            type="named"
+            name="starts-with"
+            field="field_name"
+            value="'A'">
+         </hdml-filter>
+      </hdml-connective>
+   </hdml-filter-by>
+
+   <hdml-group-by>
+      <hdml-field
+         name="field_name">
+      </hdml-field>
+   </hdml-group-by>
+
+   <hdml-sort-by>
+      <hdml-field
+         name="field_name"
+         asc="true">
+      </hdml-field>
+   </hdml-sort-by>
+
 </hdml-frame>
 ```
 
-In this example, a data frame named "my_frame" is created based on the HDML model named "model_name." The frame is configured to include a maximum of 100 rows, starting from the 11th row due to the offset of 10.
+The following HDML code demonstrates the configuration of an hdml-frame component with various data processing operations:
+
+- **Frame Definition:**
+
+   - The `hdml-frame` component named "my_frame" is defined with the following attributes:
+      - `name`: Specifies the name of the data frame.
+      - `source`: Indicates the source of the data model used to construct the frame.
+      - `limit`: Specifies the maximum number of rows to include in the frame.
+      - `offset`: Specifies the number of rows to skip before starting to include rows in the frame.
+
+- **Field Definitions:**
+
+   - Two `hdml-field` components are included within the `hdml-frame`:
+      - The first field, "field_name", retrieves data from the HDML model's field named "my_model_field_name".
+      - The second field, "field_counter", also retrieves data from "my_model_field_name" but applies an aggregation function to count the occurrences of each value.
+
+- **Data Filtering:**
+
+   - The `hdml-filter-by` component is used to filter data based on specific criteria.
+   - In this example, data is filtered to include only rows where the value of the "field_name" field starts with the letter 'A'.
+
+- **Data Grouping:**
+
+   - The `hdml-group-by` component is employed to group data based on the values of one or more fields.
+   - Here, data is grouped based on the "field_name" field.
+
+- **Data Sorting:**
+
+   - The `hdml-sort-by` component is utilized to sort the data based on specified fields.
+   - The data is sorted in ascending order based on the values of the "field_name" field.
+
+This example showcases the versatility of HDML in organizing, processing, and analyzing data within a structured framework.
