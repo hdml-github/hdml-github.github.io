@@ -1,50 +1,5 @@
 # HDML Documentation
 
-## Table of Contents
-1. [What is HDML?](#what-is-hdml)
-2. [Distributed Document Concept](#distributed-document-concept)
-   1. [Key Points](#key-points)
-3. [HDIO Server](#hdio-server)
-   1. [Key Functions](#key-functions)
-   2. [Workflow](#workflow)
-4. [Environment Variables in HDML](#environment-variables-in-hdml)
-   1. [Syntax](#syntax)
-   2. [Example](#example)
-   3. [Benefits of Using Environment Variables in HDML](#benefits-of-using-environment-variables-in-hdml)
-   4. [Best Practices for Using Environment Variables in HDML](#best-practices-for-using-environment-variables-in-hdml)
-5. [Hook Functions](#hook-functions)
-   1. [Overview](#overview)
-   2. [Example Hook Function](#example-hook-function)
-   3. [Instructions](#instructions)
-   4. [Benefits](#benefits)
-   5. [Considerations](#considerations)
-6. [HDML WebComponents](#hdml-webcomponents)
-   1. [`hdml-include`](#hdml-include)
-   2. [`hdml-connection`](#hdml-connection)
-      1. [Postgres, MySQL, MS SQL, MariaDB, Oracle, ClickHouse, Druid, Ignite, Redshift Parameters](#postgres-mysql-ms-sql-mariadb-oracle-clickhouse-druid-ignite-redshift-parameters)
-      2. [BigQuery Parameters](#bigquery-parameters)
-      3. [Google Sheets Parameters](#google-sheets-parameters)
-      4. [Elasticsearch Parameters](#elasticsearch-parameters)
-      5. [MongoDB Parameters](#mongodb-parameters)
-      6. [Example Usage](#example-usage)
-         - [Without Environment Variables](#without-environment-variables)
-         - [With Environment Variables](#with-environment-variables)
-   3. [`hdml-model`](#hdml-model)
-      1. [Attributes](#attributes)
-      2. [Example](#example)
-   4. [`hdml-table`](#hdml-table)
-      1. [Attributes](#attributes-1)
-      2. [Example](#example-1)
-   5. [`hdml-field`](#hdml-field)
-      1. [Attributes](#attributes-2)
-      2. [Examples](#examples)
-         - [General example](#general-example)
-         - [`type="decimal"`](#type="decimal")
-         - [`type="date"`](#type="date")
-         - [`type="time"`](#type="time")
-         - [`type="timestamp"`](#type="timestamp")
-
-
 ## What is HDML?
 
 HDML, or Hyperdata Markup Language, is a markup language designed for describing hierarchical data structures in a web-based environment. It provides a set of custom HTML components to represent and organize various data models. HDML is particularly useful for creating structured and interactive representations of complex data relationships on the web.
@@ -132,7 +87,7 @@ To include an environment variable in an HDML attribute, use the following synta
 Replace **`ENV_VARIABLE_NAME`** with the name of the desired environment variable.
 
 
-### Example
+### Example:
 
 Consider the following example where an environment variable is used within the `host` attribute of an `<hdml-connection>` element:
 
@@ -202,8 +157,9 @@ Create a file named `hook.js` with the following content and place it in the hoo
  * @returns {Element} - The modified or unmodified HTML element.
  */
 export function hook(dom, scope) {
-  // Add your custom logic here, utilizing the provided `dom` and `scope` parameters
-  // For example, you can conditionally modify the document based on the authenticated user's context.
+  // Add your custom logic here, utilizing the provided `dom` and
+  // `scope` parameters. For example, you can conditionally modify the
+  // document based on the authenticated user's context.
 
   // Return the modified or unmodified HTML element
   return dom;
@@ -263,7 +219,7 @@ The `<hdml-include>` component is used to include external HDML documents within
 ### Attributes
 - `path` (Required): The path to the external HDML document on the HDIO (Hyperdata Input-Output) server that you want to include.
 
-### Example Usage
+### Example:
 
 Assuming you have a hidden document with connection definitions named `connections.hdml`:
 
@@ -386,7 +342,7 @@ For the `mongodb` database type, you can use the following parameters:
 | `schema`       | The name of the MongoDB collection containing schema information. | Yes | - |
 | `meta`         | Additional metadata or description for the connection. | No    | -       |
 
-### Example Usage
+### Example:
 
 #### Without Environment Variables
 
@@ -504,7 +460,7 @@ The `hdml-field` component represents a field within an `hdml-table` in the HDML
 ### Attributes:
 
 - `name` (Required): The name of the field in the HDML context.
-- `origin` (Optional): The name of the original field in the database. If omitted, it is assumed to be the same as the HDML field name.
+- `origin` (Optional): The name of the original field in the database if used within the scope of `hdml-table`, or in the parent structure if used within the scope of an `hdml-frame`. If omitted, it is assumed to be the same as the HDML field name.
 - `type` (Optional): The data type of the field in the HDML context. Supported types include: `int-8`, `int-16`, `int-32`, `int-64`, `uint-8`, `uint-16`, `uint-32`, `uint-64`, `float-16`, `float-32`, `float-64`, `binary`, `utf-8`, `decimal`, `date`, `time`, `timestamp`.
 - `nullable` (Optional, default: `false`): Specifies whether the field can contain null values.
 - `clause` (Optional): An SQL clause defining the field. It takes precedence over the `origin` attribute. For example, ```clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)"```.
@@ -529,11 +485,11 @@ The `hdml-field` component represents a field within an `hdml-table` in the HDML
 
 ### Explanation
 
-- **`origin` Attribute**: The `origin` attribute, if specified, represents the original field name in the database. This attribute allows you to map the HDML field to its counterpart in the database.
+- **`origin` Attribute**: The `origin` attribute, if specified, represents the original field name in the database if used within the scope of `hdml-table`, or in the parent structure if used within the scope of an `hdml-frame`. This attribute allows you to map the HDML field to its counterpart in the database or `hdml-model`, or parent `hdml-frame`.
 
 - **`type` Attribute**: The `type` attribute represents the data type of the field in the HDML context. It does not necessarily mirror the original data type of the field in the database. For example, you may use `type="decimal"` in HDML, even if the original field in the database is of a different numeric type. This attribute allows flexibility in defining the data type as it should be treated within the HDML structure.
 
-### Examples
+### Example:
 
 #### General example
 
@@ -675,7 +631,7 @@ The `hdml-join` component is used to define joins between tables within an `hdml
          ```
          In this example, it defines a condition based on the equality of `field1` in `table1` with `field2` in `table2`.
 
-#### Example:
+### Example:
 
 ```html
 <hdml-join
@@ -698,7 +654,7 @@ The `hdml-join` component is used to define joins between tables within an `hdml
 
 This example demonstrates an `inner` join between `table1` and `table2` with a root `hdml-connective` connecting two conditions.
 
-#### Important Notes:
+### Important Notes:
 
 - You can't have two `hdml-connective` under the `hdml-join`. Some root connective must be there for proper connection.
 - `hdml-filter` with type "keys" is specific to `hdml-join` and must not be used elsewhere.
@@ -720,7 +676,6 @@ The `hdml-connective` component is utilized to define logical connectives. It is
 
 ```html
 <hdml-model name="my_model">
-
    <!-- hdml-model configuration -->
 
    <hdml-join
@@ -741,7 +696,6 @@ The `hdml-connective` component is utilized to define logical connectives. It is
    </hdml-join>
 
    <!-- hdml-model configuration -->
-
 </hdml-model>
 ```
 
@@ -749,7 +703,6 @@ The `hdml-connective` component is utilized to define logical connectives. It is
 
 ```html
 <hdml-frame name="my_frame">
-
    <!-- hdml-frame configuration -->
 
    <hdml-filter-by>
@@ -766,7 +719,6 @@ The `hdml-connective` component is utilized to define logical connectives. It is
    </hdml-filter-by>
 
    <!-- hdml-frame configuration -->
-
 </hdml-frame>
 ```
 
@@ -838,7 +790,6 @@ The `hdml-filter` component is utilized to define filters within the context of 
 ```html
 <hdml-model
    name="my_model">
-
    <!-- hdml-model configuration -->
 
    <hdml-join
@@ -856,7 +807,6 @@ The `hdml-filter` component is utilized to define filters within the context of 
    </hdml-join>
 
    <!-- hdml-model configuration -->
-
 </hdml-model>
 ```
 
@@ -864,7 +814,6 @@ The `hdml-filter` component is utilized to define filters within the context of 
 
 ```html
 <hdml-model name="my_model">
-
    <!-- hdml-model configuration -->
 
    <hdml-join
@@ -881,7 +830,6 @@ The `hdml-filter` component is utilized to define filters within the context of 
    </hdml-join>
 
    <!-- hdml-model configuration -->
-
 </hdml-model>
 
 ```
@@ -891,7 +839,6 @@ The `hdml-filter` component is utilized to define filters within the context of 
 ```html
 <hdml-frame
    name="my_frame">
-
    <!-- hdml-frame configuration -->
 
    <hdml-filter-by>
@@ -905,7 +852,6 @@ The `hdml-filter` component is utilized to define filters within the context of 
    </hdml-filter-by>
 
    <!-- hdml-frame configuration -->
-
 </hdml-frame>
 ```
 
@@ -913,7 +859,6 @@ The `hdml-filter` component is utilized to define filters within the context of 
 
 ```html
 <hdml-model name="my_model">
-
    <!-- hdml-model configuration -->
 
    <hdml-join
@@ -932,7 +877,6 @@ The `hdml-filter` component is utilized to define filters within the context of 
    </hdml-join>
 
    <!-- hdml-model configuration -->
-
 </hdml-model>
 ```
 
@@ -941,7 +885,6 @@ The `hdml-filter` component is utilized to define filters within the context of 
 ```html
 <hdml-frame
    name="my_frame">
-
    <!-- hdml-frame configuration -->
 
    <hdml-filter-by>
@@ -957,7 +900,6 @@ The `hdml-filter` component is utilized to define filters within the context of 
    </hdml-filter-by>
 
    <!-- hdml-frame configuration -->
-
 </hdml-frame>
 ```
 
@@ -974,6 +916,11 @@ The `hdml-frame` component is used to create a data frame based on the provided 
 - `limit` (Optional): Specifies the maximum number of rows to include in the frame.
 - `offset` (Optional): Specifies the number of rows to skip before starting to include rows in the frame.
 
+**Note:** At least one `hdml-field` must be specified within the `hdml-frame`.
+
+**Note:** In the case of using `hdml-field` within the `hdml-frame` component scope, the `origin` attribute refers to the "parent" structure field name.
+
+
 ### Example:
 
 ```html
@@ -982,6 +929,7 @@ The `hdml-frame` component is used to create a data frame based on the provided 
    source="?hdml-model=model_name"
    limit="100"
    offset="10">
+
    <!-- Frame content goes here -->
 </hdml-frame>
 ```
