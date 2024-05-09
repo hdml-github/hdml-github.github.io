@@ -1,0 +1,173 @@
+@startuml deployment
+
+  title General Deployment
+
+  node "Client Device" as Client_Device #616161 {
+    node "Browser Environment" as Browser_Environment #757575 {
+      node "Main Thread" as Main_Thread #bdbdbd
+      node "Worker Thread" as Worker_Thread #bdbdbd
+
+      Worker_Thread -ri0- Main_Thread
+    }
+  }
+
+  node "Server Device" as Server_Device #616161 {
+    node "__Singleton Container__\n Minimum: 4vCPUs/16GB\n Recommended: 16vCPUs/32GB" as Singleton_Container #757575 {
+      node "Application Server" as Application_Server [[./application.svg]] #9e9e9e
+
+      frame "Querying" as Querying #9e9e9e {
+        queue "__Apache Pulsar__\n Memory minimum: 2GB\n Memory recommended: 8GB" as Apache_Pulsar #bdbdbd
+        Apache_Pulsar -ri0)- Application_Server
+
+        node "__Apache Trino__\n Memory minimum: 4GB\n Memory recommended: 16GB" as Apache_Trino #bdbdbd
+        Apache_Pulsar -[hidden]- Apache_Trino
+        Application_Server -(0- Apache_Trino
+      }
+
+      frame "Caching" as Caching #9e9e9e {
+        node "__Apache Airflow__\n Memory minimum: 4GB" as Apache_Airflow #bdbdbd
+        Application_Server -0)- Apache_Airflow
+
+        database "__ClickHouse__\n Memory minimum: 2GB\n Memory recommended: 4GB" as ClickHouse #bdbdbd
+        ClickHouse -0)- Apache_Airflow
+        Application_Server -ri(0- ClickHouse
+      }
+
+      database "File System" as File_System [[./fs.svg]] #9e9e9e
+      Apache_Pulsar -(0- File_System
+      Apache_Trino -ri(0- File_System
+      Application_Server -(0- File_System
+      ClickHouse -(0- File_System
+      Apache_Airflow -le(0- File_System
+    }
+  }
+
+  interface "Public REST API" as Public_REST_API
+  Worker_Thread --( Public_REST_API
+  Public_REST_API -- Application_Server
+
+  interface "Private REST API" as Private_REST_API
+  Private_REST_API -- Application_Server
+
+@enduml
+
+@startuml application
+  title Application Server
+
+  interface "Tenants REST API" as Tenants_REST_API
+
+  node "Application Server" as Application_Server #616161 {
+    node "Tenants Service" as Tenants_Service [[./tenants.svg]] #757575
+    Tenants_REST_API -- Tenants_Service
+  }
+@enduml
+
+@startuml tenants
+
+  title Tenants Service Deployment
+
+  note as API
+    **Endpoints:**
+    ----
+    * [[./ POST /api/v1/tenants]]
+    * [[./ PATCH /api/v1/tenants?tenant=:tenant]]
+    * [[./ DELETE /api/v1/tenants?tenant=:tenant]]
+    * [[./ GET /api/v1/tenants?tenant=:tenant]]
+    * [[./ GET /api/v1/tenants/token?tenant=:tenant&ttl=:ttl&scope=:scope]]
+  end note
+
+  interface "Tenants REST API" as Tenants_REST_API
+  API -- Tenants_REST_API
+
+  node "Application Server" as Application_Server #616161 {
+    queue "tenants_req" as tenants_req_queue #bdbdbd
+    queue "tenants_res" as tenants_res_queue #bdbdbd
+
+    node "Tenants Service" as Tenants_Service #757575
+    Tenants_REST_API -- Tenants_Service
+    tenants_req_queue -ri0)- Tenants_Service
+    tenants_res_queue -le0)- Tenants_Service
+
+    node "git" as git #9e9e9e
+    Tenants_Service -(0- git
+
+    node "javi" as javi #9e9e9e
+    Tenants_Service -(0- javi
+
+    node "ssh-keygen" as ssh_keygen #9e9e9e
+    Tenants_Service -(0- ssh_keygen
+
+    database "File System" as File_System [[./fs.svg]] #757575
+    Tenants_Service -(0-- File_System
+    javi -(0- File_System
+    git -(0- File_System
+    ssh_keygen -(0- File_System
+  }
+@enduml
+
+@startuml fs
+  title File system
+
+  folder "/hdio" as hdio #616161 {
+
+    folder "sys" as sys #757575 {
+      folder "keys" as sys_keys #9e9e9e {
+        file "sys.key" as sys_key #fafafa
+        file "sys.pub" as sys_pub #fafafa
+      }
+
+      folder "logs" as sys_logs #9e9e9e {
+        file "pulsar.log" as pulsar_log #fafafa
+        file "trino.log" as trino_log #fafafa
+        file "clickhouse.log" as clickhouse_log #fafafa
+        file "airflow.log" as airflow.log #fafafa
+      }
+      sys_keys -[hidden]-- sys_logs
+      
+      folder "data" as sys_data #9e9e9e {
+        folder "pulsar" as pulsar_data #bdbdbd
+        folder "trino" as trino_data #bdbdbd
+        folder "clickhouse" as clickhouse_data #bdbdbd
+        folder "airflow" as airflow_data #bdbdbd
+      }
+      sys_logs -[hidden]-- sys_data
+    }
+
+    folder "usr" as usr #757575 {
+      folder "name" as name #9e9e9e {
+        folder "data" as usr_data #bdbdbd {
+          file "tenant.key" as key #fafafa
+          file "tenant.pub" as pub #fafafa
+          file "tenant.git" as git #fafafa
+          file "tenant.env" as dotenv #fafafa
+        }
+
+        folder "git" as usr_git #bdbdbd {
+          folder "hooks" as hooks #e0e0e0 {
+            file "auth.js" as auth_js #fafafa
+            file "patch.js" as patch_js #fafafa
+            file "cache.js" as cache_js #fafafa
+          }
+          folder "hdmls" as hdmls #e0e0e0 {
+            file "model.html" as model_html #fafafa
+            file "frame.html" as frame_html #fafafa
+          }
+        }
+        usr_data -[hidden]-- usr_git
+
+        folder "bin" as usr_bin #bdbdbd {
+          folder "wasm" as wasm #e0e0e0 {
+            file "auth.wasm" as auth_wasm #fafafa
+            file "patch.wasm" as patch_wasm #fafafa
+            file "cache.wasm" as cache_wasm #fafafa
+          }
+          folder "docs" as docs #e0e0e0 {
+            file "model.doc" as model_doc #fafafa
+            file "frame.doc" as frame_doc #fafafa
+          }
+        }
+        usr_git -[hidden]-- usr_bin
+      }
+    }
+  }  
+@enduml
