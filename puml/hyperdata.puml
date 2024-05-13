@@ -1,0 +1,44 @@
+@startuml post_docs
+  title POST /api/v1/hdio/:tenant/docs
+
+  actor "Client" as Client
+  participant "HyperData Service" as HyperData_Service
+  database "Memory System" as Memory_System [[https://askubuntu.com/questions/152868/how-do-i-make-a-ram-disk]]
+  database "File System" as File_System [[../general/fs.svg]]
+
+
+  Client -> HyperData_Service: POST /api/v1/hdio/:tenant/docs
+  note bottom
+    headers:
+      hdml-auth: <...>
+      Authorization: Barear <...>
+      ...
+    payload: <...>
+  end note
+
+  
+  group Auth query
+    alt hdfs/usr/:tenant/bin/wasm/auth.wasm exists
+      HyperData_Service -> File_System: loads hdfs/usr/:tenant/bin/wasm/auth.wasm
+      HyperData_Service <- File_System: auth.wasm
+      HyperData_Service -> Memory_System: saves /hdio/:id/in
+      note bottom
+        "api": "docs",
+        "method": "POST",
+        "headers": {
+          "hdml-auth": "...",
+          "Authorization": "Barear ...",
+          ...
+        }
+      end note
+      HyperData_Service -> Memory_System: creates /hdio/:id/scope
+      HyperData_Service -> Memory_System: creates /hdio/:id/err
+
+      HyperData_Service -> HyperData_Service: executes auth.wasm
+
+      HyperData_Service -> Memory_System: removes /hdio/:id/in
+    else
+
+    end
+  end
+@enduml

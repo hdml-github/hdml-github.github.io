@@ -58,6 +58,7 @@
   title Application Server
 
   node "Application Server" as Application_Server #616161 {
+    node "HyperData Service" as HyperData_Service [[./hyperdata.svg]] #9e9e9e
     node "Sessions Service" as Sessions_Service [[./sessions.svg]] #9e9e9e
     node "Tenants Service" as Tenants_Service [[./tenants.svg]] #9e9e9e
   }
@@ -144,10 +145,37 @@
 @enduml
 
 
+@startuml hyperdata
+  title HyperData Service Deployment
+
+  note as API
+    **Endpoints:**
+    ----
+    * [[../hyperdata/post_docs.svg POST /api/v1/hdio/:tenant/docs]]
+    * [[./ GET /api/v1/hdio/:tenant/docs/:doc]]
+    * [[./ GET /api/v1/hdio/:tenant/docs/:doc/bin]]
+    * [[./ GET /api/v1/hdio/:tenant/docs/:doc/obj]]
+    * [[./ GET /api/v1/hdio/:tenant/docs/:doc/sql?field=:name&field=:name]]
+    * [[./ GET /api/v1/hdio/:tenant/docs/:doc/data?field=:name&field=:name]]
+  end note
+
+  interface "/api/v1/hdio" as HDIO_REST_API
+  API -- HDIO_REST_API
+
+  node "Application Server" as Application_Server #616161 {
+    node "HyperData Service" as HyperData_Service #757575
+    HDIO_REST_API -- HyperData_Service
+  }
+  
+  database "File System" as File_System [[./fs.svg]] #757575
+  HyperData_Service -(0- File_System
+@enduml
+
+
 @startuml fs
   title File system
 
-  folder "/hdio" as hdio #616161 {
+  folder "/hdfs" as hdfs #616161 {
 
     folder "sys" as sys #757575 {
       folder "keys" as sys_keys #9e9e9e {
@@ -181,7 +209,7 @@
           file "tenant.env" as dotenv #e0e0e0
         }
 
-        folder "git" as usr_git #bdbdbd {
+        folder "lib" as usr_lib #bdbdbd {
           folder "hooks" as hooks #e0e0e0 {
             file "auth.js" as auth_js #fafafa
             file "patch.js" as patch_js #fafafa
@@ -192,7 +220,7 @@
             file "frame.html" as frame_html #fafafa
           }
         }
-        usr_data -[hidden]-- usr_git
+        usr_data -[hidden]-- usr_lib
 
         folder "bin" as usr_bin #bdbdbd {
           folder "wasm" as wasm #e0e0e0 {
@@ -205,7 +233,7 @@
             file "frame.doc" as frame_doc #fafafa
           }
         }
-        usr_git -[hidden]-- usr_bin
+        usr_lib -[hidden]-- usr_bin
       }
     }
   }  
