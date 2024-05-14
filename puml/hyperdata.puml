@@ -1,44 +1,119 @@
+@startuml req_auth
+  title Request Authorization
+
+  participant "HyperData Service" as HyperData_Service
+  participant "auth.wasm" as auth_wasm
+  database "Memory System" as Memory_System [[https://askubuntu.com/questions/152868/how-do-i-make-a-ram-disk]]
+  database "File System" as File_System [[../general/fs.svg]]
+
+
+  -> HyperData_Service: HTTP request
+
+  
+  HyperData_Service -> File_System: loads hdfs/usr/:tenant/bin/wasm/auth.wasm
+  
+  alt auth.wasm is exists
+    HyperData_Service <- File_System: auth.wasm
+
+    group IO prepare
+      HyperData_Service -> Memory_System: saves /hdio/:id/auth
+      note bottom
+        "api": "...",
+        "method": "...",
+        "headers": {
+          ...
+        }
+      end note
+      HyperData_Service -> Memory_System: creates /hdio/:id/scope
+      HyperData_Service -> Memory_System: creates /hdio/:id/error
+    end
+
+    group Evaluation
+      HyperData_Service -> auth_wasm **: runs auth.wasm
+      auth_wasm <-> Memory_System: read /hdio/:id/auth
+      
+      auth_wasm -> auth_wasm: evaluate auth
+      alt auth failed
+        auth_wasm -> Memory_System: saves to /hdio/:id/error
+      else
+        auth_wasm -> Memory_System: saves to /hdio/:id/scope
+      end
+
+      HyperData_Service <- Memory_System: loads /hdio/:id/error
+      HyperData_Service <- Memory_System: loads /hdio/:id/scope
+      HyperData_Service -> HyperData_Service: configures scope and error
+    end
+
+    group IO cleanup
+      HyperData_Service -> Memory_System: removes /hdio/:id/auth
+      HyperData_Service -> Memory_System: removes /hdio/:id/scope
+      HyperData_Service -> Memory_System: removes /hdio/:id/error
+    end
+  else
+    HyperData_Service -> File_System: loads hdfs/usr/:tenant/data/tenant.key
+    HyperData_Service <- File_System: tenant.key
+    HyperData_Service -> HyperData_Service: decrypts "HDAuth" header
+    HyperData_Service -> HyperData_Service: configures scope and error
+  end
+
+  alt auth failed
+    <- HyperData_Service: returns error
+  else
+    <- HyperData_Service: returns scope
+  end
+@enduml
+
+
+@startuml hddm_disasm
+  title Disassembly of HTML documents
+
+  start
+    :hash, hddm/
+
+    while (hddm.models.forEach(model))
+      :name = hash + "." + md5("?model=" + model.name) + ".m"]
+      if (!lru.contains(name)) then
+        :content = fbs.Model(model)]
+        :hdfs.save(name, content)]
+        :lru.add(name, content)]
+      end if
+    endWhile
+
+    while (hddm.frames.forEach(frame))
+      :name = hash + "." + md5("?frame=" + frame.name) + ".f"]
+      if (!lru.contains(name)) then
+        :content = fbs.Frame(frame)]
+        :hdfs.save(name, content)]
+        :lru.add(name, content)]
+      end if
+    endWhile
+
+    :return true/
+  end
+@enduml
+
+
 @startuml post_docs
   title POST /api/v1/hdio/:tenant/docs
 
   actor "Client" as Client
   participant "HyperData Service" as HyperData_Service
-  database "Memory System" as Memory_System [[https://askubuntu.com/questions/152868/how-do-i-make-a-ram-disk]]
   database "File System" as File_System [[../general/fs.svg]]
 
 
   Client -> HyperData_Service: POST /api/v1/hdio/:tenant/docs
   note bottom
     headers:
-      hdml-auth: <...>
-      Authorization: Barear <...>
+      HDAuth: "..."
       ...
-    payload: <...>
+    payload: "..."
   end note
 
-  
-  group Auth query
-    alt hdfs/usr/:tenant/bin/wasm/auth.wasm exists
-      HyperData_Service -> File_System: loads hdfs/usr/:tenant/bin/wasm/auth.wasm
-      HyperData_Service <- File_System: auth.wasm
-      HyperData_Service -> Memory_System: saves /hdio/:id/in
-      note bottom
-        "api": "docs",
-        "method": "POST",
-        "headers": {
-          "hdml-auth": "...",
-          "Authorization": "Barear ...",
-          ...
-        }
-      end note
-      HyperData_Service -> Memory_System: creates /hdio/:id/scope
-      HyperData_Service -> Memory_System: creates /hdio/:id/err
-
-      HyperData_Service -> HyperData_Service: executes auth.wasm
-
-      HyperData_Service -> Memory_System: removes /hdio/:id/in
-    else
-
-    end
+  HyperData_Service -> HyperData_Service: [[./req_auth.svg Authorizes request]]
+  alt auth failed
+    Client <- HyperData_Service: returns 403
+  else
+    HyperData_Service -> HyperData_Service: calcs HDDM hash
+    HyperData_Service -> HyperData_Service: [[./hddm_disasm.svg runs HDDM disasm]]
   end
 @enduml

@@ -201,7 +201,7 @@
     }
 
     folder "usr" as usr #757575 {
-      folder "name" as name #9e9e9e {
+      folder ":tenant" as name #9e9e9e {
         folder "data" as usr_data #bdbdbd {
           file "tenant.key" as key #e0e0e0
           file "tenant.pub" as pub #e0e0e0
@@ -229,8 +229,8 @@
             file "cache.wasm" as cache_wasm #fafafa
           }
           folder "docs" as docs #e0e0e0 {
-            file "model.doc" as model_doc #fafafa
-            file "frame.doc" as frame_doc #fafafa
+            file "model.hash.m" as model_doc #fafafa
+            file "frame.hash.f" as frame_doc #fafafa
           }
         }
         usr_lib -[hidden]-- usr_bin
