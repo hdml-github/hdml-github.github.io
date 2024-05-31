@@ -1,0 +1,225 @@
+@startuml package
+  title @hdml/renderer package
+
+  package "@hdml/common" as common {
+    class LitElement [[https://lit.dev/docs/api/LitElement/]] {
+      +[[./LitElement_constructor.svg constructor()]]: LitElement
+      ..
+      +connectedCallback(): void
+      +disconnectedCallback(): void
+      ..
+      +[[./LitElement_requestUpdate.svg requestUpdate()]]: void
+      #[[./LitElement_performUpdate.svg performUpdate()]]: void
+      #shouldUpdate(props: Map<string, unknown>): boolean
+      #willUpdate(values: PropertyValues): void
+      #[[./LitElement_update.svg update(values: PropertyValues)]]: void
+      ..
+      #firstUpdated(props: Map<PropertyKey, unknown>): void
+      #updated(props: Map<string, unknown>): void
+      #[[./LitElement_getUpdateComplete.svg getUpdateComplete()]]: Promise<void>
+    }
+
+    class UnifiedElement extends LitElement {
+      +get uid(): string
+    }
+  }
+
+  package "@hdml/renderer" as renderer {
+    enum TickStyles {
+      +"text"
+      +"rect"
+      +"ellipse"
+    }
+
+    enum CurveTypes {
+      +"natural"
+      +"linear"
+      +"cubic"
+      +"step"
+      +"bezier"
+      +"basis"
+      +"cardinal"
+      +"catmull-rom"
+    }
+
+    enum CurveBezierTangents {
+      +"horizontal"
+      +"vertical"
+    }
+
+    enum CurveCubicMonotonicity {
+      +"x"
+      +"y"
+    }
+
+    enum CurveStepChanges {
+      +"before"
+      +"middle"
+      +"after"
+    }
+
+    interface TrackedStyles {
+      ..size..
+      +width: number
+      +height: number
+      ..position..
+      +top: number
+      +left: number
+      ..paddings..
+      +paddingTop: number
+      +paddingRight: number
+      +paddingBottom: number
+      +paddingLeft: number
+      ..cursor..
+      +cursor: string
+      ..line width..
+      +lineWidth: number
+      +lineWidthActive: number
+      +lineWidthFocus: number
+      +lineWidthHover: number
+      ..line color..
+      +lineColor: string
+      +lineColorActive: string
+      +lineColorFocus: string
+      +lineColorHover: string
+      ..line style..
+      +lineStyle: string
+      +lineStyleActive: string
+      +lineStyleFocus: string
+      +lineStyleHover: string
+      ..fill color (background)..
+      +fillColor: string
+      +fillColorActive: string
+      +fillColorFocus: string
+      +fillColorHover: string
+      ..font family..
+      +fontFamily: string
+      +fontFamilyActive: string
+      +fontFamilyFocus: string
+      +fontFamilyHover: string
+      ..font size..
+      +fontSize: string
+      +fontSizeActive: string
+      +fontSizeFocus: string
+      +fontSizeHover: string
+      ..font weight..
+      +fontWeight: string
+      +fontWeightActive: string
+      +fontWeightFocus: string
+      +fontWeightHover: string
+      ..font style..
+      +fontStyle: string
+      +fontStyleActive: string
+      +fontStyleFocus: string
+      +fontStyleHover: string
+      ..tick style..
+      +tickStyle: TickStyles
+      +tickWidth: number
+      +tickHeight: number
+      ..curve style..
+      +curveType: CurveTypes
+      +curveBasisBeta: number [0..1]
+      +curveBezierTangents: CurveBezierTangents
+      +curveCardinalTension: number [0..1]
+      +curveCatmullRomAlpha: number [0..1]
+      +curveCubicMonotonicity: CurveCubicMonotonicity
+      +curveStepChange: CurveStepChanges
+    }
+    TrackedStyles -- TickStyles
+    TrackedStyles -- CurveTypes
+    TrackedStyles -- CurveBezierTangents
+    TrackedStyles -- CurveCubicMonotonicity
+    TrackedStyles -- CurveStepChanges
+
+    abstract class AbstractChartElement {
+      -_view: null | HdmlViewElement
+      -_ssheet: CompletedCSSStyleSheet
+      -_styles: CSSStyleDeclaration
+      -_cache: null | TrackedStyles
+      -_stored: TrackedStyles
+      ..
+      #{abstract} geometrySelector: null | string
+      ..
+      +get view(): null | HdmlViewElement
+      +get styles(): CSSStyleDeclaration
+      +get tracked(): TrackedStyles
+      +get stored(): TrackedStyles
+      ..
+      +constructor(): AbstractChartElement
+      ..
+      +connectedCallback(): void
+      +disconnectedCallback(): void
+      +shouldUpdate(props: Map<string, unknown>): boolean
+      ..
+      #firstUpdated(props: Map<PropertyKey, unknown>): void
+      #updated(props: Map<string, unknown>): void
+      #resetStylesheets(sheets: CSSStyleSheet[]): void
+      #updateStyles(): void
+      ..
+      #{abstract} renderGeometry(): void
+      #{abstract} updateGeometry(): void
+      ..
+      -stylesChangedListener(): void
+      -getStaticStyles(): lit.CSSResult
+    }
+    UnifiedElement <|-- AbstractChartElement
+    AbstractChartElement *-- TrackedStyles
+  }
+@enduml
+
+@startuml LitElement_constructor
+  title LitElement#constructor()
+
+  start
+    :[[./LitElement_requestUpdate.svg this.requestUpdate()]] ]
+  end
+@enduml
+
+@startuml LitElement_requestUpdate
+  title LitElement#requestUpdate()
+
+  start
+    :Adding request to the queue,\nasync dequeue.|
+    :[[./LitElement_performUpdate.svg this.performUpdate()]] ]
+  end
+@enduml
+
+@startuml LitElement_performUpdate
+  title LitElement#performUpdate()
+
+  start
+
+    group Update
+      if (this.shouldUpdate()) then (yes)
+        :this.willUpdate()]
+        :[[./LitElement_update.svg this.update()]] ]
+      endif
+    end group
+
+    group PostUpdate
+      if (!this.hasUpdated) then (yes)
+        :this.firstUpdated()]
+      endif
+      :this.updated()]
+      :[[./LitElement_getUpdateComplete.svg this.getUpdateComplete()]] ]
+    end group
+
+  end
+@enduml
+
+@startuml LitElement_update
+  title LitElement#update()
+
+  start
+    :Reflects property values to attributes.]
+    :this.render()]
+  end
+@enduml
+
+@startuml LitElement_getUpdateComplete
+  title LitElement#getUpdateComplete()
+
+  start
+    :resolve(this.updateComplete)]
+  end
+@enduml

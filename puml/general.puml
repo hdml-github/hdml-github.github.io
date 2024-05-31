@@ -3,10 +3,7 @@
 
   node "Client Device" as Client_Device #616161 {
     node "Browser Environment" as Browser_Environment #757575 {
-      node "Main Thread" as Main_Thread #bdbdbd
-      node "Worker Thread" as Worker_Thread #bdbdbd
-
-      Main_Thread -0- Worker_Thread
+      node "Client App" as Client_App [[./client.svg]] #bdbdbd
     }
   }
 
@@ -42,15 +39,45 @@
   }
 
   interface "/api/v1/hdio" as Public_REST_API
-  Worker_Thread --( Public_REST_API
+  Client_App --( Public_REST_API
   Public_REST_API -- Application_Server
 
   interface "/api/v1/sessions" as Sessions_REST_API
-  Worker_Thread --( Sessions_REST_API
+  Client_App --( Sessions_REST_API
   Sessions_REST_API -- Application_Server
 
   interface "/api/v1/tenants" as Tenants_REST_API
   Tenants_REST_API -- Application_Server
+@enduml
+
+@startuml client
+  title Client App
+
+  interface "/api/v1/hdio" as Public_REST_API
+  interface "/api/v1/sessions" as Sessions_REST_API
+
+  node "Client App" as Client_App #616161 {
+    node "Worker Thread" as Worker_Thread #757575 {
+      component "HDMLAggregator" as HDMLAggregator #bdbdbd
+
+      component "HDMLParser" as HDMLParser #bdbdbd
+      
+      component "HDMLClient" as HDMLClient #bdbdbd
+      Public_REST_API )--- HDMLClient
+      Sessions_REST_API )--- HDMLClient
+
+      component "HDMLBroker" as HDMLBroker #bdbdbd
+      HDMLClient -le0)- HDMLBroker
+      HDMLAggregator -0)- HDMLBroker
+      HDMLParser -ri0)- HDMLBroker
+    }
+
+    node "Main Thread" as Main_Thread #757575 {
+      component "<hdml-io>" as hdml_io #bdbdbd
+    }
+    Worker_Thread <-- hdml_io: initialize/terminate
+    HDMLBroker -(0)- hdml_io
+  }
 @enduml
 
 
@@ -152,11 +179,11 @@
     **Endpoints:**
     ----
     * [[../hyperdata/post_docs.svg POST /api/v1/hdio/:tenant/docs]]
-    * [[./ GET /api/v1/hdio/:tenant/docs/:doc]]
+    * [[./ GET /api/v1/hdio/:tenant/docs/:doc/htm]]
     * [[./ GET /api/v1/hdio/:tenant/docs/:doc/bin]]
     * [[./ GET /api/v1/hdio/:tenant/docs/:doc/obj]]
-    * [[./ GET /api/v1/hdio/:tenant/docs/:doc/sql?field=:name&field=:name]]
-    * [[./ GET /api/v1/hdio/:tenant/docs/:doc/data?field=:name&field=:name]]
+    * [[./ GET /api/v1/hdio/:tenant/docs/:doc/sql?frame=:frame&field=:name&field=:name]]
+    * [[./ GET /api/v1/hdio/:tenant/docs/:doc/data?model=:model&field=:name&field=:name]]
   end note
 
   interface "/api/v1/hdio" as HDIO_REST_API
