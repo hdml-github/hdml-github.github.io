@@ -58,7 +58,7 @@
       +"after"
     }
 
-    interface TrackedStyles {
+    interface TrackedStyle {
       ..size..
       +width: number
       +height: number
@@ -125,11 +125,11 @@
       +curveCubicMonotonicity: CurveCubicMonotonicity
       +curveStepChange: CurveStepChanges
     }
-    TrackedStyles -- TickStyles
-    TrackedStyles -- CurveTypes
-    TrackedStyles -- CurveBezierTangents
-    TrackedStyles -- CurveCubicMonotonicity
-    TrackedStyles -- CurveStepChanges
+    TrackedStyle -- TickStyles
+    TrackedStyle -- CurveTypes
+    TrackedStyle -- CurveBezierTangents
+    TrackedStyle -- CurveCubicMonotonicity
+    TrackedStyle -- CurveStepChanges
 
     abstract class AbstractChartElement {
       -_view: null | HdmlViewElement
@@ -163,7 +163,45 @@
       -getStaticStyles(): lit.CSSResult
     }
     UnifiedElement <|-- AbstractChartElement
-    AbstractChartElement *-- TrackedStyles
+    AbstractChartElement *-- TrackedStyle
+
+    abstract class AbstractStyleMapperElement {
+      -_shadowStyle: CompletedCSSStyleSheet
+      -_geometryStyle: CompletedCSSStyleSheet
+      -_computedStyle: CSSStyleDeclaration
+      -_trackedStyleStore: TrackedStyle
+      -_trackedStyleCache: TrackedStyle
+      ..
+      #{abstract} selector: null | string
+      ..
+      +get geometryStyle(): CompletedCSSStyleSheet
+      +get trackedStyle(): TrackedStyle
+      ..
+      #[[./AbstractStyleMapperElement_shouldUpdate.svg shouldUpdate]](props: Map<string, unknown>): boolean
+      ..
+      #clearTrackedStyleCache(): void
+      #[[AbstractStyleMapperElement_updateStyles.svg updateStyles]](): void
+      ..
+      -[[AbstractStyleMapperElement_updateShadowStyle.svg updateShadowStyle]](): void
+      #getShadowStyle(): string[]
+      ..
+      -[[./AbstractStyleMapperElement_updateGeometryStyle.svg updateGeometryStyle]](): void
+      #[[./AbstractStyleMapperElement_getGeometryStyle.svg getGeometryStyle]](): string[]
+      ..
+      -getSvgStateStyle(state?: hover|focus|active): string
+      -getSvgCursorStyle(state?: hover|focus|active): string
+      -getSvgOutlineStyle(state?: hover|focus|active): string
+      -getSvgFontFamilyStyle(state?: hover|focus|active): string
+      -getSvgFontSizeStyle(state?: hover|focus|active): string
+      -getSvgFontWeightStyle(state?: hover|focus|active): string
+      -getSvgFontStyleStyle(state?: hover|focus|active): string
+      -getSvgStrokeStyle(state?: hover|focus|active): string
+      -getSvgStrokeWidthStyle(state?: hover|focus|active): string
+      -getSvgStrokeDasharrayStyle(state?: hover|focus|active): string
+      -getSvgStrokeLinecapStyle(state?: hover|focus|active): string
+      -getSvgFillStyle(state?: hover|focus|active): string
+    }
+    UnifiedElement <|-- AbstractStyleMapperElement
   }
 @enduml
 
@@ -221,5 +259,65 @@
 
   start
     :resolve(this.updateComplete)]
+  end
+@enduml
+
+@startuml AbstractStyleMapperElement_shouldUpdate
+  title AbstractStyleMapperElement#shouldUpdate()
+
+  start
+    :this._trackedStyleCache !== this._trackedStyleStore/
+  end
+@enduml
+
+@startuml AbstractStyleMapperElement_updateStyles
+  title AbstractStyleMapperElement#updateStyles()
+
+  start
+    :this._trackedStyleStore = this._trackedStyleCache]
+    :this.[[./AbstractStyleMapperElement_updateShadowStyle.svg updateShadowStyle]]()]
+    :lit.adoptStyles(this.renderRoot, [this.staticStyle, ...this._shadowStyle])]
+    :this.[[./AbstractStyleMapperElement_updateGeometryStyle.svg updateGeometryStyle]]()]
+    :this.dispatchEvent("@hdml/renderer.ElementStyleUpdated")]
+  end
+@enduml
+
+@startuml AbstractStyleMapperElement_updateShadowStyle
+  title AbstractStyleMapperElement#updateShadowStyle()
+
+  start
+    :styles = this.getShadowStyle()]
+    while (i = this._shadowStyle.cssRules.length - 1; i >= 0; i--)
+      :this._shadowStyle.deleteRule(i)]
+    endwhile
+    while (styles.forEach(rule))
+      :this._shadowStyle.insertRule(rule)]
+    endwhile
+  end
+@enduml
+
+@startuml AbstractStyleMapperElement_updateGeometryStyle
+  title AbstractStyleMapperElement#updateGeometryStyle()
+
+  start
+    :styles = this.getSvgStyle()]
+    while (i = this.geometryStyle.cssRules.length - 1; i >= 0; i--)
+      :this.geometryStyle.deleteRule(i)]
+    endwhile
+    while (styles.forEach(rule))
+      :this.geometryStyle.insertRule(rule)]
+    endwhile
+  end
+@enduml
+
+@startuml AbstractStyleMapperElement_getGeometryStyle
+  title AbstractStyleMapperElement#getGeometryStyle()
+
+  start
+    :default = getSvgStateStyle()]
+    :active = getSvgStateStyle("active")]
+    :focus = getSvgStateStyle("focus")]
+    :hover = getSvgStateStyle("hover")]
+    :return [default, active, focus, hover] /
   end
 @enduml
