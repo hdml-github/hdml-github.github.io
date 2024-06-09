@@ -25,160 +25,123 @@
   }
 
   package "@hdml/renderer" as renderer {
-    ' enum TickStyles {
-    '   +"text"
-    '   +"rect"
-    '   +"ellipse"
-    ' }
+    enum TickStyles {
+      +"text"
+      +"rect"
+      +"ellipse"
+    }
 
-    ' enum CurveTypes {
-    '   +"natural"
-    '   +"linear"
-    '   +"cubic"
-    '   +"step"
-    '   +"bezier"
-    '   +"basis"
-    '   +"cardinal"
-    '   +"catmull-rom"
-    ' }
+    enum CurveTypes {
+      +"natural"
+      +"linear"
+      +"cubic"
+      +"step"
+      +"bezier"
+      +"basis"
+      +"cardinal"
+      +"catmull-rom"
+    }
 
-    ' enum CurveBezierTangents {
-    '   +"horizontal"
-    '   +"vertical"
-    ' }
+    enum CurveBezierTangents {
+      +"horizontal"
+      +"vertical"
+    }
 
-    ' enum CurveCubicMonotonicity {
-    '   +"x"
-    '   +"y"
-    ' }
+    enum CurveCubicMonotonicity {
+      +"x"
+      +"y"
+    }
 
-    ' enum CurveStepChanges {
-    '   +"before"
-    '   +"middle"
-    '   +"after"
-    ' }
+    enum CurveStepChanges {
+      +"before"
+      +"middle"
+      +"after"
+    }
 
-    ' interface TrackedStyle {
-    '   ..size..
-    '   +width: number
-    '   +height: number
-    '   ..position..
-    '   +top: number
-    '   +left: number
-    '   ..paddings..
-    '   +paddingTop: number
-    '   +paddingRight: number
-    '   +paddingBottom: number
-    '   +paddingLeft: number
-    '   ..cursor..
-    '   +cursor: string
-    '   ..line width..
-    '   +lineWidth: number
-    '   +lineWidthActive: number
-    '   +lineWidthFocus: number
-    '   +lineWidthHover: number
-    '   ..line color..
-    '   +lineColor: string
-    '   +lineColorActive: string
-    '   +lineColorFocus: string
-    '   +lineColorHover: string
-    '   ..line style..
-    '   +lineStyle: string
-    '   +lineStyleActive: string
-    '   +lineStyleFocus: string
-    '   +lineStyleHover: string
-    '   ..fill color (background)..
-    '   +fillColor: string
-    '   +fillColorActive: string
-    '   +fillColorFocus: string
-    '   +fillColorHover: string
-    '   ..font family..
-    '   +fontFamily: string
-    '   +fontFamilyActive: string
-    '   +fontFamilyFocus: string
-    '   +fontFamilyHover: string
-    '   ..font size..
-    '   +fontSize: string
-    '   +fontSizeActive: string
-    '   +fontSizeFocus: string
-    '   +fontSizeHover: string
-    '   ..font weight..
-    '   +fontWeight: string
-    '   +fontWeightActive: string
-    '   +fontWeightFocus: string
-    '   +fontWeightHover: string
-    '   ..font style..
-    '   +fontStyle: string
-    '   +fontStyleActive: string
-    '   +fontStyleFocus: string
-    '   +fontStyleHover: string
-    '   ..tick style..
-    '   +tickStyle: TickStyles
-    '   +tickWidth: number
-    '   +tickHeight: number
-    '   ..curve style..
-    '   +curveType: CurveTypes
-    '   +curveBasisBeta: number [0..1]
-    '   +curveBezierTangents: CurveBezierTangents
-    '   +curveCardinalTension: number [0..1]
-    '   +curveCatmullRomAlpha: number [0..1]
-    '   +curveCubicMonotonicity: CurveCubicMonotonicity
-    '   +curveStepChange: CurveStepChanges
-    ' }
-    ' TrackedStyle -- TickStyles
-    ' TrackedStyle -- CurveTypes
-    ' TrackedStyle -- CurveBezierTangents
-    ' TrackedStyle -- CurveCubicMonotonicity
-    ' TrackedStyle -- CurveStepChanges
+    interface TrackedStyle {
+      ..size..
+      +width: number
+      +height: number
+      ..position..
+      +top: number
+      +left: number
+      ..paddings..
+      +paddingTop: number
+      +paddingRight: number
+      +paddingBottom: number
+      +paddingLeft: number
+      ..cursor..
+      +cursor: string
+      ..line width..
+      +lineWidth: number
+      +lineWidthActive: number
+      +lineWidthFocus: number
+      +lineWidthHover: number
+      ..line color..
+      +lineColor: string
+      +lineColorActive: string
+      +lineColorFocus: string
+      +lineColorHover: string
+      ..line style..
+      +lineStyle: string
+      +lineStyleActive: string
+      +lineStyleFocus: string
+      +lineStyleHover: string
+      ..fill color (background)..
+      +fillColor: string
+      +fillColorActive: string
+      +fillColorFocus: string
+      +fillColorHover: string
+      ..font family..
+      +fontFamily: string
+      +fontFamilyActive: string
+      +fontFamilyFocus: string
+      +fontFamilyHover: string
+      ..font size..
+      +fontSize: string
+      +fontSizeActive: string
+      +fontSizeFocus: string
+      +fontSizeHover: string
+      ..font weight..
+      +fontWeight: string
+      +fontWeightActive: string
+      +fontWeightFocus: string
+      +fontWeightHover: string
+      ..font style..
+      +fontStyle: string
+      +fontStyleActive: string
+      +fontStyleFocus: string
+      +fontStyleHover: string
+      ..tick style..
+      +tickStyle: TickStyles
+      +tickWidth: number
+      +tickHeight: number
+      ..curve style..
+      +curveType: CurveTypes
+      +curveBasisBeta: number [0..1]
+      +curveBezierTangents: CurveBezierTangents
+      +curveCardinalTension: number [0..1]
+      +curveCatmullRomAlpha: number [0..1]
+      +curveCubicMonotonicity: CurveCubicMonotonicity
+      +curveStepChange: CurveStepChanges
+    }
+    TickStyles -- TrackedStyle
+    CurveTypes -- TrackedStyle
+    CurveBezierTangents -- TrackedStyle
+    CurveCubicMonotonicity -- TrackedStyle
+    CurveStepChanges -- TrackedStyle
 
-    ' abstract class AbstractChartElement {
-    '   -_view: null | HdmlViewElement
-    '   -_ssheet: CompletedCSSStyleSheet
-    '   -_styles: CSSStyleDeclaration
-    '   -_cache: null | TrackedStyles
-    '   -_stored: TrackedStyles
-    '   ..
-    '   #{abstract} geometrySelector: null | string
-    '   ..
-    '   +get view(): null | HdmlViewElement
-    '   +get styles(): CSSStyleDeclaration
-    '   +get tracked(): TrackedStyles
-    '   +get stored(): TrackedStyles
-    '   ..
-    '   +constructor(): AbstractChartElement
-    '   ..
-    '   +connectedCallback(): void
-    '   +disconnectedCallback(): void
-    '   +shouldUpdate(props: Map<string, unknown>): boolean
-    '   ..
-    '   #firstUpdated(props: Map<PropertyKey, unknown>): void
-    '   #updated(props: Map<string, unknown>): void
-    '   #resetStylesheets(sheets: CSSStyleSheet[]): void
-    '   #updateStyles(): void
-    '   ..
-    '   #{abstract} renderGeometry(): void
-    '   #{abstract} updateGeometry(): void
-    '   ..
-    '   -stylesChangedListener(): void
-    '   -getStaticStyles(): lit.CSSResult
-    ' }
-    ' UnifiedElement <|-- AbstractChartElement
-    ' AbstractChartElement *-- TrackedStyle
-
-    abstract class AbstractChartElement {
+    class AbstractChartElement {
       -_forceUpdate: boolean
       ..
-      +[[./AbstractChartElement_forceUpdate.svg forceUpdate]](): void
+      #[[./AbstractChartElement_forceUpdate.svg forceUpdate]](): void
       #[[./AbstractChartElement_shouldUpdate.svg shouldUpdate]](props: Map<string, unknown>): boolean
       ..
       #[[./AbstractChartElement_firstUpdated.svg firstUpdated]](props: Map<string, unknown>): void
       #[[./AbstractChartElement_updated.svg updated]](props: Map<string, unknown>): void
       ..
-      #{abstract} renderGeometry(): void
-      #{abstract} renderStyle(): void
-      ..
-      #{abstract} updateGeometry(): void
-      #{abstract} updateStyle(): void
+      #{abstract} firstUpgrade(): void
+      #{abstract} upgrade(): void
     }
     UnifiedElement <|-- AbstractChartElement
 
@@ -205,8 +168,11 @@
       ..
       #[[./AbstractStyleElement_shouldUpdate.svg shouldUpdate]](props: Map<string, unknown>): boolean
       ..
-      #[[./AbstractStyleElement_renderStyle.svg renderStyle]](): void
-      #[[./AbstractStyleElement_updateStyle.svg updateStyle]](): void
+      #[[./AbstractStyleElement_firstUpgrade.svg firstUgrade]](): void
+      #[[./AbstractStyleElement_upgrade.svg upgrade]](): void
+      ..
+      -[[./AbstractStyleElement_renderStyle.svg renderStyle]](): void
+      -[[./AbstractStyleElement_updateStyle.svg updateStyle]](): void
       ..
       -[[./AbstractStyleElement_updateShadowStyle.svg updateShadowStyle]](): void
       #getShadowStyle(): string[]
@@ -228,6 +194,36 @@
       -getSvgFillStyle(state?: hover|focus|active): string
     }
     AbstractChartElement <|-- AbstractStyleElement
+    AbstractStyleElement *- TrackedStyle
+
+    abstract class AbstractGeometryElement {
+      #[[./AbstractGeometryElement_firstUpgrade.svg firstUpgrade]](): void
+      #[[./AbstractGeometryElement_upgrade.svg upgrade]](): void
+      ..
+      #{abstract} renderGeometry(): void
+      #{abstract} updateGeometry(): void
+    }
+    AbstractStyleElement <|-- AbstractGeometryElement
+
+    class HdmlViewElement {
+      -_svg: null | Selection<SVGSVGElement>
+      -_geometryStyleSet: Set<CSSStyleSheet>
+      ..
+      #selector: string
+      ..
+      +svg: null | Selection<SVGSVGElement>
+      ..
+      +[[./HdmlViewElement_connectedCallback.svg connectedCallback]](): void
+      +[[./HdmlViewElement_disconnectedCallback.svg disconnectedCallback]](): void
+      ..
+      -[[./HdmlViewElement_hdmlElementStyleUpdatedListener.svg hdmlElementStyleUpdatedListener]](evt: HdmlElementStyleUpdated): void
+      ..
+      +render(): lit.TemplateResult<1>
+      ..
+      #renderGeometry(): void
+      #updateGeometry(): void
+    }
+    AbstractGeometryElement <|- HdmlViewElement
   }
 @enduml
 
@@ -315,8 +311,7 @@
   title AbstractChartElement#firstUpdated()
 
   start
-    :setTimeout(this.renderGeometry)]
-    :setTimeout(this.renderStyle)]
+    :setTimeout(this.firstUpgrade)]
   end
 @enduml
 
@@ -324,9 +319,25 @@
   title AbstractChartElement#updated()
 
   start
-    :setTimeout(this.updateStyles)]
-    :setTimeout(this.updateGeometry)]
-    :this.dispatchEvent("HdmlElementUpdated")]
+    :setTimeout(this.upgrade)]
+  end
+@enduml
+
+@startuml AbstractStyleElement_firstUpgrade
+  title AbstractStyleElement#firstUpgrade()
+
+  start
+    :this.[[./AbstractStyleElement_renderStyle.svg renderStyle]]()]
+    :this.dispatchEvent("HdmlElementStyleAdded")]
+  end
+@enduml
+
+@startuml AbstractStyleElement_upgrade
+  title AbstractStyleElement#upgrade()
+
+  start
+    :this.[[./AbstractStyleElement_updateStyle.svg updateStyle]]()]
+    :this.dispatchEvent("HdmlElementStyleUpdated")]
   end
 @enduml
 
@@ -426,5 +437,55 @@
     :focus = getSvgStateStyle("focus")]
     :hover = getSvgStateStyle("hover")]
     :return [default, active, focus, hover] /
+  end
+@enduml
+
+@startuml AbstractGeometryElement_firstUpgrade
+  title AbstractGeometryElement#firstUpgrade()
+
+  start
+    :super.[[./AbstractStyleElement_firstUpgrade.svg firstUpgrade]]()]
+    :this.renderGeometry()]
+    :this.dispatchEvent("HdmlElementGeometryAdded")]
+  end
+@enduml
+
+@startuml AbstractGeometryElement_upgrade
+  title AbstractGeometryElement#upgrade()
+
+  start
+    :super.[[./AbstractStyleElement_upgrade.svg upgrade]]()]
+    :this.updateGeometry()]
+    :this.dispatchEvent("HdmlElementGeometryUpdated")]
+  end
+@enduml
+
+@startuml HdmlViewElement_connectedCallback
+  title HdmlViewElement#connectedCallback()
+
+  start
+    :super.[[./AbstractStyleElement_connectedCallback.svg connectedCallback]]()]
+    :window.addEventListener("HdmlElementStyleUpdated", this.[[./HdmlViewElement_hdmlElementStyleUpdatedListener.svg hdmlElementStyleUpdatedListener]])]
+  end
+@enduml
+
+@startuml HdmlViewElement_disconnectedCallback
+  title HdmlViewElement#disconnectedCallback()
+
+  start
+    :super.[[./AbstractStyleElement_disconnectedCallback.svg connectedCallback]]()]
+    :window.removeEventListener("HdmlElementStyleUpdated", this.[[./HdmlViewElement_hdmlElementStyleUpdatedListener.svg hdmlElementStyleUpdatedListener]])]
+  end
+@enduml
+
+@startuml HdmlViewElement_hdmlElementStyleUpdatedListener
+  title HdmlViewElement#hdmlElementStyleUpdatedListener()
+
+  start
+    :evt/
+    if (!this._geometryStyleSet.has(evt.target.geometryStyle)) (yes)
+      :this._geometryStyleSet.add(stylesheet)]
+      :lit.adoptStyles(this.renderRoot, [this.staticStyle, ...this._geometryStyleSet.values()])]
+    endif
   end
 @enduml
