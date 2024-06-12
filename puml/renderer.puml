@@ -196,15 +196,6 @@
     AbstractChartElement <|-- AbstractStyleElement
     AbstractStyleElement *- TrackedStyle
 
-    abstract class AbstractGeometryElement {
-      #[[./AbstractGeometryElement_firstUpgrade.svg firstUpgrade]](): void
-      #[[./AbstractGeometryElement_upgrade.svg upgrade]](): void
-      ..
-      #{abstract} renderGeometry(): void
-      #{abstract} updateGeometry(): void
-    }
-    AbstractStyleElement <|-- AbstractGeometryElement
-
     class HdmlViewElement {
       -_svg: null | Selection<SVGSVGElement>
       -_geometryStyleSet: Set<CSSStyleSheet>
@@ -220,10 +211,90 @@
       ..
       +render(): lit.TemplateResult<1>
       ..
-      #renderGeometry(): void
-      #updateGeometry(): void
+      #[[./HdmlViewElement_firstUpgrade.svg firstUpgrade]](): void
+      #[[./HdmlViewElement_upgrade.svg upgrade]](): void
     }
-    AbstractGeometryElement <|- HdmlViewElement
+    HdmlViewElement -|> AbstractStyleElement
+
+    abstract class AbstractPlaneElement
+    AbstractStyleElement <|-- AbstractPlaneElement
+
+    class CartesianPlaneElement {
+      +{static} styles: lit.CSSResult
+      ..
+      #selector: null
+      ..
+      +render(): lit.TemplateResult<1>
+    }
+    AbstractPlaneElement <|-- CartesianPlaneElement
+
+    class PolarPlaneElement {
+      +{static} styles: lit.CSSResult
+      ..
+      #selector: null
+      ..
+      +render(): lit.TemplateResult<1>
+    }
+    AbstractPlaneElement <|-- PolarPlaneElement
+
+    abstract class AbstractScaleElement {
+      #selector: null
+      ..
+      +get plane(): null | AbstractPlaneElement
+      +get dimension(): null | Dimension
+      +get range(): [number, number]
+      ..
+      #[[./AbstractScaleElement_upgrade.svg upgrade]](): void
+      #getShadowStyle(): [string]
+      ..
+      #{abstract} updateScale(): void
+      ..
+      +render(): lit.TemplateResult<1>
+    }
+    AbstractStyleElement <|-- AbstractScaleElement
+    AbstractPlaneElement -o AbstractScaleElement
+
+    enum Dimension {
+      +"X"
+      +"Y"
+      +"Z"
+      +"I"
+      +"J"
+    }
+    AbstractScaleElement *- Dimension
+
+    class LinearScaleElement {
+      +{static} styles: lit.CSSResult
+      ..
+      -_min: number
+      -_max: number
+      -_scale: null | d3.ScaleLinear<number, number, never>
+      ..
+      +set min(val: number)
+      +get min(): number
+      +set max(val: number)
+      +get max(): number
+      +get scale(): null | d3.ScaleLinear<number, number, never>
+      ..
+      #[[./LinearScaleElement_shouldUpdate.svg shouldUpdate]](props: Map<string, unknown>): boolean
+      #updateScale(): void
+    }
+    AbstractScaleElement <|-- LinearScaleElement
+
+    class OrdinalScaleElement
+    AbstractScaleElement <|-- OrdinalScaleElement
+
+    class ChromaticScaleElement
+    AbstractScaleElement <|-- ChromaticScaleElement
+
+    abstract class AbstractGeometryElement {
+      #[[./AbstractGeometryElement_firstUpgrade.svg firstUpgrade]](): void
+      #[[./AbstractGeometryElement_upgrade.svg upgrade]](): void
+      ..
+      #{abstract} renderGeometry(): void
+      #{abstract} updateGeometry(): void
+    }
+    AbstractStyleElement <|-- AbstractGeometryElement
   }
 @enduml
 
@@ -440,26 +511,6 @@
   end
 @enduml
 
-@startuml AbstractGeometryElement_firstUpgrade
-  title AbstractGeometryElement#firstUpgrade()
-
-  start
-    :super.[[./AbstractStyleElement_firstUpgrade.svg firstUpgrade]]()]
-    :this.renderGeometry()]
-    :this.dispatchEvent("HdmlElementGeometryAdded")]
-  end
-@enduml
-
-@startuml AbstractGeometryElement_upgrade
-  title AbstractGeometryElement#upgrade()
-
-  start
-    :super.[[./AbstractStyleElement_upgrade.svg upgrade]]()]
-    :this.updateGeometry()]
-    :this.dispatchEvent("HdmlElementGeometryUpdated")]
-  end
-@enduml
-
 @startuml HdmlViewElement_connectedCallback
   title HdmlViewElement#connectedCallback()
 
@@ -483,9 +534,71 @@
 
   start
     :evt/
-    if (!this._geometryStyleSet.has(evt.target.geometryStyle)) (yes)
+    if (!this._geometryStyleSet.has(evt.target.geometryStyle))
       :this._geometryStyleSet.add(stylesheet)]
       :lit.adoptStyles(this.renderRoot, [this.staticStyle, ...this._geometryStyleSet.values()])]
     endif
+  end
+@enduml
+
+@startuml HdmlViewElement_firstUpgrade
+  title HdmlViewElement#firstUpgrade()
+
+  start
+    :super.[[./AbstractStyleElement_firstUpgrade.svg firstUpgrade]]()]
+    :this._svg = select(this.renderRoot.querySelector("svg"))]
+    :this.dispatchEvent("HdmlViewAdded")]
+  end
+@enduml
+
+@startuml HdmlViewElement_upgrade
+  title HdmlViewElement#upgrade()
+
+  start
+    :super.[[./AbstractStyleElement_upgrade.svg upgrade]]()]
+    :this._svg.updateViewBox()]
+    :this.dispatchEvent("HdmlViewUpdated")]
+  end
+@enduml
+
+@startuml AbstractScaleElement_upgrade
+  title AbstractScaleElement#upgrade()
+
+  start
+    :super.[[./AbstractStyleElement_upgrade.svg upgrade]]()]
+    :this.updateScale()]
+    :this.dispatchEvent("HdmlScaleUpdated")]
+  end
+@enduml
+
+@startuml LinearScaleElement_shouldUpdate
+  title AbstractStyleElement#shouldUpdate()
+
+  start
+    if (this.min || this.max changed) then (yes)
+      :return true/
+    else (no)
+      :return super.[[./AbstractStyleElement_shouldUpdate.svg shouldUpdate]]() /
+    endif
+  end
+@enduml
+
+@startuml AbstractGeometryElement_firstUpgrade
+  title AbstractGeometryElement#firstUpgrade()
+
+  start
+    :super.[[./AbstractStyleElement_firstUpgrade.svg firstUpgrade]]()]
+    :this.renderGeometry()]
+    :this.dispatchEvent("HdmlElementGeometryAdded")]
+  end
+@enduml
+
+@startuml AbstractGeometryElement_upgrade
+  title AbstractGeometryElement#upgrade()
+
+  start
+    :super.[[./AbstractStyleElement_upgrade.svg upgrade]]()]
+    :this.updateGeometry()]
+    :this.dispatchEvent("HdmlElementGeometryUpdated")]
   end
 @enduml
