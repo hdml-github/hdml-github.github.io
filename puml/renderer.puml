@@ -214,7 +214,7 @@
       #[[./HdmlViewElement_firstUpgrade.svg firstUpgrade]](): void
       #[[./HdmlViewElement_upgrade.svg upgrade]](): void
     }
-    HdmlViewElement -|> AbstractStyleElement
+    AbstractStyleElement <|-- HdmlViewElement
 
     abstract class AbstractPlaneElement
     AbstractStyleElement <|-- AbstractPlaneElement
@@ -251,8 +251,8 @@
       ..
       +render(): lit.TemplateResult<1>
     }
-    AbstractStyleElement <|-- AbstractScaleElement
-    AbstractPlaneElement -o AbstractScaleElement
+    AbstractStyleElement <|---- AbstractScaleElement
+    AbstractPlaneElement ---o AbstractScaleElement
 
     enum Dimension {
       +"X"
@@ -281,10 +281,35 @@
     }
     AbstractScaleElement <|-- LinearScaleElement
 
-    class OrdinalScaleElement
+    class OrdinalScaleElement {
+      +{static} styles: lit.CSSResult
+      ..
+      -_bandwidth: number
+      -_values: string[]
+      -_unknown: null | string
+      -_scale: null | ScaleBand<string>
+      ..
+      +set bandwidth(val: number)
+      +get bandwidth(): number
+      +set values(val: Array<string>)
+      +get values(): Array<string>
+      +set unknown(val: null | string)
+      +get unknown(): null | string
+      +get scale(): null | ScaleBand<string>
+      ..
+      #[[./OrdinalScaleElement_shouldUpdate.svg shouldUpdate]](props: Map<string, unknown>): boolean
+      #updateScale(): void
+    }
     AbstractScaleElement <|-- OrdinalScaleElement
 
-    class ChromaticScaleElement
+    class ChromaticScaleElement {
+      +{static} styles: lit.CSSResult
+      ..
+      TBD
+      ..
+      #[[./ChromaticScaleElement_shouldUpdate.svg shouldUpdate]](props: Map<string, unknown>): boolean
+      #updateScale(): void
+    }
     AbstractScaleElement <|-- ChromaticScaleElement
 
     abstract class AbstractGeometryElement {
@@ -294,7 +319,8 @@
       #{abstract} renderGeometry(): void
       #{abstract} updateGeometry(): void
     }
-    AbstractStyleElement <|-- AbstractGeometryElement
+    AbstractStyleElement <|------ AbstractGeometryElement
+    HdmlViewElement ------o AbstractGeometryElement
   }
 @enduml
 
@@ -572,10 +598,34 @@
 @enduml
 
 @startuml LinearScaleElement_shouldUpdate
-  title AbstractStyleElement#shouldUpdate()
+  title LinearScaleElement#shouldUpdate()
 
   start
     if (this.min || this.max changed) then (yes)
+      :return true/
+    else (no)
+      :return super.[[./AbstractStyleElement_shouldUpdate.svg shouldUpdate]]() /
+    endif
+  end
+@enduml
+
+@startuml OrdinalScaleElement_shouldUpdate
+  title OrdinalScaleElement#shouldUpdate()
+
+  start
+    if (this.bandwidth || this.values || this.unknown changed) then (yes)
+      :return true/
+    else (no)
+      :return super.[[./AbstractStyleElement_shouldUpdate.svg shouldUpdate]]() /
+    endif
+  end
+@enduml
+
+@startuml ChromaticScaleElement_shouldUpdate
+  title ChromaticScaleElement#shouldUpdate()
+
+  start
+    if (TBD properties changed) then (yes)
       :return true/
     else (no)
       :return super.[[./AbstractStyleElement_shouldUpdate.svg shouldUpdate]]() /
