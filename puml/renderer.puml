@@ -152,7 +152,7 @@
       -_trackedStyleStore: TrackedStyle
       -_trackedStyleCache: TrackedStyle
       ..
-      #{abstract} selector: null | string
+      #{abstract} get geometrySelector(): null | string
       ..
       +get geometryStyle(): CompletedCSSStyleSheet
       +get staticStyle(): lit.CSSResult
@@ -168,7 +168,7 @@
       ..
       #[[./AbstractStyleElement_shouldUpdate.svg shouldUpdate]](props: Map<string, unknown>): boolean
       ..
-      #[[./AbstractStyleElement_firstUpgrade.svg firstUgrade]](): void
+      #[[./AbstractStyleElement_firstUpgrade.svg firstUpgrade]](): void
       #[[./AbstractStyleElement_upgrade.svg upgrade]](): void
       ..
       -[[./AbstractStyleElement_renderStyle.svg renderStyle]](): void
@@ -200,14 +200,14 @@
       -_svg: null | Selection<SVGSVGElement>
       -_geometryStyleSet: Set<CSSStyleSheet>
       ..
-      #selector: string
+      #get geometrySelector(): string
       ..
       +svg: null | Selection<SVGSVGElement>
       ..
       +[[./HdmlViewElement_connectedCallback.svg connectedCallback]](): void
       +[[./HdmlViewElement_disconnectedCallback.svg disconnectedCallback]](): void
       ..
-      -[[./HdmlViewElement_hdmlElementStyleUpdatedListener.svg hdmlElementStyleUpdatedListener]](evt: HdmlElementStyleUpdated): void
+      -[[./HdmlViewElement_HdmlStyleElementUpdatedListener.svg HdmlStyleElementUpdatedListener]](evt: HdmlStyleElementUpdated): void
       ..
       +render(): lit.TemplateResult<1>
       ..
@@ -222,7 +222,7 @@
     class CartesianPlaneElement {
       +{static} styles: lit.CSSResult
       ..
-      #selector: null
+      #get geometrySelector(): null
       ..
       +render(): lit.TemplateResult<1>
     }
@@ -231,14 +231,14 @@
     class PolarPlaneElement {
       +{static} styles: lit.CSSResult
       ..
-      #selector: null
+      #get geometrySelector(): null
       ..
       +render(): lit.TemplateResult<1>
     }
     AbstractPlaneElement <|-- PolarPlaneElement
 
     abstract class AbstractScaleElement {
-      #selector: null
+      #get geometrySelector(): null
       ..
       +get plane(): null | AbstractPlaneElement
       +get dimension(): null | Dimension
@@ -313,6 +313,9 @@
     AbstractScaleElement <|-- ChromaticScaleElement
 
     abstract class AbstractGeometryElement {
+      #get view(): null | HdmlViewElement
+      #{abstract} get geometrySelection(): null | SelectedGroup | SelectedPath
+      ..
       #[[./AbstractGeometryElement_firstUpgrade.svg firstUpgrade]](): void
       #[[./AbstractGeometryElement_upgrade.svg upgrade]](): void
       ..
@@ -321,6 +324,68 @@
     }
     AbstractStyleElement <|------ AbstractGeometryElement
     HdmlViewElement ------o AbstractGeometryElement
+
+    abstract class AbstractDirectionElement {
+      +{abstract} get direction(): Direction;
+      +{abstract} get dimension(): Dimension;
+      +{abstract} set dimension(): Dimension;
+      ..
+    }
+    AbstractGeometryElement <|-- AbstractDirectionElement
+
+    enum Direction {
+      +"Horizontal"
+      +"Vertical"
+    }
+    AbstractDirectionElement *- Direction
+
+    abstract class AbstractAxisElement {
+      #get geometrySelector(): null | string
+      ..
+    }
+    AbstractDirectionElement <|-- AbstractAxisElement
+
+    class HorizontalAxisElement {
+      ..
+    }
+    AbstractAxisElement <|-- HorizontalAxisElement
+
+    class VerticalAxisElement {
+      ..
+    }
+    AbstractAxisElement <|-- VerticalAxisElement
+
+    abstract class AbstractAxisGridElement {
+      #get geometrySelector(): null | string
+      ..
+    }
+    AbstractDirectionElement <|-- AbstractAxisGridElement
+
+    class HorizontalAxisGridElement {
+      ..
+    }
+    AbstractAxisGridElement <|-- HorizontalAxisGridElement
+
+    class VerticalAxisGridElement {
+      ..
+    }
+    AbstractAxisGridElement <|-- VerticalAxisGridElement
+
+    abstract class AbstractAxisTickElement {
+      #get geometrySelector(): null | string
+      ..
+    }
+    AbstractDirectionElement <|-- AbstractAxisTickElement
+
+    class HorizontalAxisTickElement {
+      ..
+    }
+    AbstractAxisTickElement <|-- HorizontalAxisTickElement
+
+    class VerticalAxisTickElement {
+      ..
+    }
+    AbstractAxisTickElement <|-- VerticalAxisTickElement
   }
 @enduml
 
@@ -425,7 +490,7 @@
 
   start
     :this.[[./AbstractStyleElement_renderStyle.svg renderStyle]]()]
-    :this.dispatchEvent("HdmlElementStyleAdded")]
+    :this.dispatchEvent("HdmlStyleElementAdded")]
   end
 @enduml
 
@@ -434,7 +499,7 @@
 
   start
     :this.[[./AbstractStyleElement_updateStyle.svg updateStyle]]()]
-    :this.dispatchEvent("HdmlElementStyleUpdated")]
+    :this.dispatchEvent("HdmlStyleElementUpdated")]
   end
 @enduml
 
@@ -542,7 +607,7 @@
 
   start
     :super.[[./AbstractStyleElement_connectedCallback.svg connectedCallback]]()]
-    :window.addEventListener("HdmlElementStyleUpdated", this.[[./HdmlViewElement_hdmlElementStyleUpdatedListener.svg hdmlElementStyleUpdatedListener]])]
+    :window.addEventListener("HdmlStyleElementUpdated", this.[[./HdmlViewElement_HdmlStyleElementUpdatedListener.svg HdmlStyleElementUpdatedListener]])]
   end
 @enduml
 
@@ -551,12 +616,12 @@
 
   start
     :super.[[./AbstractStyleElement_disconnectedCallback.svg connectedCallback]]()]
-    :window.removeEventListener("HdmlElementStyleUpdated", this.[[./HdmlViewElement_hdmlElementStyleUpdatedListener.svg hdmlElementStyleUpdatedListener]])]
+    :window.removeEventListener("HdmlStyleElementUpdated", this.[[./HdmlViewElement_HdmlStyleElementUpdatedListener.svg HdmlStyleElementUpdatedListener]])]
   end
 @enduml
 
-@startuml HdmlViewElement_hdmlElementStyleUpdatedListener
-  title HdmlViewElement#hdmlElementStyleUpdatedListener()
+@startuml HdmlViewElement_HdmlStyleElementUpdatedListener
+  title HdmlViewElement#HdmlStyleElementUpdatedListener()
 
   start
     :evt/
@@ -639,7 +704,7 @@
   start
     :super.[[./AbstractStyleElement_firstUpgrade.svg firstUpgrade]]()]
     :this.renderGeometry()]
-    :this.dispatchEvent("HdmlElementGeometryAdded")]
+    :this.dispatchEvent("HdmlGeometryElementAdded")]
   end
 @enduml
 
